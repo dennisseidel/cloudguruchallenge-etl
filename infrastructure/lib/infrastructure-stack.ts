@@ -2,6 +2,9 @@ import * as cdk from '@aws-cdk/core';
 import * as sns from '@aws-cdk/aws-sns';
 import * as subscriptions from '@aws-cdk/aws-sns-subscriptions';
 import * as lambda from '@aws-cdk/aws-lambda';
+import { Rule, Schedule } from '@aws-cdk/aws-events';
+import { LambdaFunction } from '@aws-cdk/aws-events-targets';
+
 
 export class InfrastructureStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -15,5 +18,11 @@ export class InfrastructureStack extends cdk.Stack {
       code: lambda.Code.fromAsset('../etl'),
       handler: 'us_covid_pipeline.handler'
     })
+
+    const rule = new Rule(this, 'ScheduleRule', {
+      schedule: Schedule.cron({ minute: '0', hour: '4' })
+    });
+    rule.addTarget(new LambdaFunction(usCovidPipeline))
+
   }
 }
