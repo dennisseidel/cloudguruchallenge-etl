@@ -1,6 +1,7 @@
 import * as cdk from '@aws-cdk/core';
 import * as sns from '@aws-cdk/aws-sns';
 import * as subscriptions from '@aws-cdk/aws-sns-subscriptions';
+import * as lambda from '@aws-cdk/aws-lambda';
 
 export class InfrastructureStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -8,5 +9,11 @@ export class InfrastructureStack extends cdk.Stack {
 
     const etlNotificationTopic = new sns.Topic(this, 'etlNotificationTopic');
     etlNotificationTopic.addSubscription(new subscriptions.EmailSubscription('den.seidel@gmail.com'));
+
+    const usCovidPipeline = new lambda.Function(this, "UsCovidPipelineHandler", {
+      runtime: lambda.Runtime.PYTHON_3_8,
+      code: lambda.Code.fromAsset('../etl'),
+      handler: 'us_covid_pipeline.handler'
+    })
   }
 }
